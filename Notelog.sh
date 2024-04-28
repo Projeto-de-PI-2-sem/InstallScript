@@ -1,26 +1,12 @@
 #!/bin/bash
-echo"           _____                   _______               _____                    _____                    _____           _______                   _____          "
-echo"          /\    \                 /::\    \             /\    \                  /\    \                  /\    \         /::\    \                 /\    \         "
-echo"         /::\____\               /::::\    \           /::\    \                /::\    \                /::\____\       /::::\    \               /::\    \        "
-echo"        /::::|   |              /::::::\    \          \:::\    \              /::::\    \              /:::/    /      /::::::\    \             /::::\    \       "
-echo"       /:::::|   |             /::::::::\    \          \:::\    \            /::::::\    \            /:::/    /      /::::::::\    \           /::::::\    \      "
-echo"      /::::::|   |            /:::/~~\:::\    \          \:::\    \          /:::/\:::\    \          /:::/    /      /:::/~~\:::\    \         /:::/\:::\    \     "
-echo"     /:::/|::|   |           /:::/    \:::\    \          \:::\    \        /:::/__\:::\    \        /:::/    /      /:::/    \:::\    \       /:::/  \:::\    \    "
-echo"    /:::/ |::|   |          /:::/    / \:::\    \         /::::\    \      /::::\   \:::\    \      /:::/    /      /:::/    / \:::\    \     /:::/    \:::\    \   "
-echo"   /:::/  |::|   | _____   /:::/____/   \:::\____\       /::::::\    \    /::::::\   \:::\    \    /:::/    /      /:::/____/   \:::\____\   /:::/    / \:::\    \  "
-echo"  /:::/   |::|   |/\    \ |:::|    |     |:::|    |     /:::/\:::\    \  /:::/\:::\   \:::\    \  /:::/    /      |:::|    |     |:::|    | /:::/    /   \:::\ ___\ "
-echo" /:: /    |::|   /::\____\|:::|____|     |:::|    |    /:::/  \:::\____\/:::/__\:::\   \:::\____\/:::/____/       |:::|____|     |:::|    |/:::/____/  ___\:::|    |"
-echo" \::/    /|::|  /:::/    / \:::\    \   /:::/    /    /:::/    \::/    /\:::\   \:::\   \::/    /\:::\    \        \:::\    \   /:::/    / \:::\    \ /\  /:::|____|"
-echo"  \/____/ |::| /:::/    /   \:::\    \ /:::/    /    /:::/    / \/____/  \:::\   \:::\   \/____/  \:::\    \        \:::\    \ /:::/    /   \:::\    /::\ \::/    / "
-echo"          |::|/:::/    /     \:::\    /:::/    /    /:::/    /            \:::\   \:::\    \       \:::\    \        \:::\    /:::/    /     \:::\   \:::\ \/____/  "
-echo"          |::::::/    /       \:::\__/:::/    /    /:::/    /              \:::\   \:::\____\       \:::\    \        \:::\__/:::/    /       \:::\   \:::\____\    "
-echo"          |:::::/    /         \::::::::/    /     \::/    /                \:::\   \::/    /        \:::\    \        \::::::::/    /         \:::\  /:::/    /    "
-echo"          |::::/    /           \::::::/    /       \/____/                  \:::\   \/____/          \:::\    \        \::::::/    /           \:::\/:::/    /     "
-echo"          /:::/    /             \::::/    /                                  \:::\    \               \:::\    \        \::::/    /             \::::::/    /      "
-echo"         /:::/    /               \::/____/                                    \:::\____\               \:::\____\        \::/____/               \::::/    /       "
-echo"         \::/    /                 ~~                                           \::/    /                \::/    /         ~~                      \::/____/        "
-echo"          \/____/                                                                \/____/                  \/____/                                                   "
-echo""
+echo " __    _  _______  _______  _______  ___      _______  _______ "
+echo "|  |  | ||       ||       ||       ||   |    |       ||       |"
+echo "|   |_| ||   _   ||_     _||    ___||   |    |   _   ||    ___|"
+echo "|       ||  | |  |  |   |  |   |___ |   |    |  | |  ||   | __ "
+echo "|  _    ||  |_|  |  |   |  |    ___||   |___ |  |_|  ||   ||  |"
+echo "| | |   ||       |  |   |  |   |___ |       ||       ||   |_| |"
+echo "|_|  |__||_______|  |___|  |_______||_______||_______||_______|"
+echo ""
 
 echo "======================================================"
 echo “Bem vindo ao instalador NoteLog”
@@ -34,7 +20,7 @@ if [ \“$get\” == \“s\” ]; then #entao
     if [ $? = 0 ]; then
         echo “Maquinario já possui JRE Java”
     else
-        echo “sudo apt install openjdk-17-jre -y”
+        sudo apt install openjdk-17-jre -y
     fi
 
     #Verificando se maquinário possui MySQL
@@ -42,7 +28,7 @@ if [ \“$get\” == \“s\” ]; then #entao
     if [ $? = 0 ]; then
         echo “Maquinario já possui MySQL”
     else
-        echo “sudo apt-get install mysql-server -y”
+        sudo apt-get install mysql-server -y
     fi
 
     #Verificando se maquinário possui Git
@@ -50,24 +36,27 @@ if [ \“$get\” == \“s\” ]; then #entao
     if [ $? = 0 ]; then
         echo “Maquinario já possui Git”
     else
-        echo “sudo apt-get install git-all -y”
+        sudo apt-get install git-all -y
     fi
 
     # Clone do repositórios Git
     git clone https://github.com/Projeto-de-PI-2-sem/Banco-De-Dados.git
     git clone https://github.com/Projeto-de-PI-2-sem/Notelog-Application.git
-
-    cd Notelog-Application/out/artifacts/Notelog_Application_jar
-    chmod 777
-    java -jar Notelog-Application.jar 
-    clear
-    echo "Instalação concluida"
-
-
+	
+	# Setando banco local
+	cd Banco-De-Dados
+	echo "Insira sua senha de Usuário abaixo para prosseguir:"
+	sudo mysql -u root -p "" < BD-Notelog.sql
+	
+	# Setando jar
+	cd ..
+	cd Notelog-Application/app-note-log/target
+	clear
+	java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar
+	
 
 else
 echo "======================================================"
 echo "                 Instalação cancelada                 "
 echo "======================================================"    
 fi
-

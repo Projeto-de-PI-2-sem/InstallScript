@@ -41,7 +41,7 @@ if [ \“$get\” == \“s\” ]; then #entao
 
     # Clone do repositórios Git
     git clone https://github.com/Projeto-de-PI-2-sem/Banco-De-Dados.git
-    git clone https://github.com/Projeto-de-PI-2-sem/Notelog-Application.git
+    git clone https://github.com/IsaacSSJunior/jar-individual-notelog.git
 	
 	# Setando banco local
 	cd Banco-De-Dados

@@ -41,7 +41,7 @@ if [ \“$get\” == \“s\” ]; then #entao
 
     # Clone do repositórios Git
     git clone https://github.com/Projeto-de-PI-2-sem/Banco-De-Dados.git
-    git clone https://github.com/IsaacSSJunior/jar-individual-notelog.git
+    git clone https://github.com/Projeto-de-PI-2-sem/Notelog-Application.git
 	
 	# Setando banco local
 	cd Banco-De-Dados
@@ -50,7 +50,7 @@ if [ \“$get\” == \“s\” ]; then #entao
 	
 	# Setando jar
 	cd ..
-	cd jar-individual-notelog/target
+	cd Notelog-Application/app-note-log/target
 	clear
 	java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar
 	

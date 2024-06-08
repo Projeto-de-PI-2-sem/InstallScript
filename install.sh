@@ -71,6 +71,9 @@ if [ "$get" = "s" ]; then # então
     cd ..
 
     echo "FROM mysql:latest
+    ENV MYSQL_DATABASE=notelog
+    ENV MYSQL_USER=notelogUser
+    ENV MYSQL_PASSWORD=notelikeag0d*
     ENV MYSQL_ROOT_PASSWORD=notelikeag0d*
     COPY ./Banco-De-Dados /docker-entrypoint-initdb.d/
     EXPOSE 3306" > Dockerfile
@@ -110,6 +113,7 @@ if [ "$get" = "s" ]; then # então
     # Criar o novo script e escrever o conteúdo nele
     echo "#!/bin/bash
     clear
+    cd assets
     java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar" > Notelog.sh
 
     # Tornar o novo script executável
@@ -121,7 +125,6 @@ if [ "$get" = "s" ]; then # então
     cd assets
     find . -type f ! -name 'app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar' -exec rm -f {} +
     sudo rm -rf Banco-De-Dados
-    mv install.sh
 else
     echo "======================================================"
     echo "                 Instalação cancelada                 "

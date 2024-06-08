@@ -65,24 +65,45 @@ if [ "$get" = "s" ]; then # então
     # Clonar os repositórios Git
     git clone https://github.com/Projeto-de-PI-2-sem/Banco-De-Dados.git
     git clone https://github.com/Projeto-de-PI-2-sem/Notelog-Application.git
+
+    cd Banco-De-Dados
+    find . -type f ! -name 'BD-Notelog.sql' -exec rm -f {} +
+
     echo "FROM mysql:latest
     ENV MYSQL_ROOT_PASSWORD=notelikeag0d*
     COPY ./Banco-De-Dados /docker-entrypoint-initdb.d/
     EXPOSE 3306" > Dockerfile
-
-
-    cd Banco-De-Dados
-    find . -type f ! -name 'BD-Notelog.sql' -exec rm -f {} +
     cd ..
 
     cd Notelog-Application/target
     mv app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar ../..
+    
+
     cd ../..
     sudo rm -rf Notelog-Application
 
-    # Construir e rodar a imagem Docker
+    # Construir e rodar a imagem Docker   
+    echo "Construindo a imagem Docker..."
     sudo docker build -t notelogbd .
+    if [ $? -ne 0 ]; then
+        echo "Erro ao construir a imagem Docker."
+        exit 1
+    fi
+
+    # Parar e remover o contêiner antigo se existir
+    if sudo docker ps -a | grep -q "notelog-container"; then
+        echo "Parando e removendo o contêiner antigo..."
+        sudo docker stop notelog-container
+        sudo docker rm notelog-container
+    fi
+
+    # Executar um novo contêiner
+    echo "Executando o contêiner Docker..."
     sudo docker run -d --name notelog-container -p 3306:3306 notelogbd
+    if [ $? -ne 0 ]; then
+        echo "Erro ao executar o contêiner Docker."
+        exit 1
+    fi
     cd ..
 
     # Criar o novo script e escrever o conteúdo nele

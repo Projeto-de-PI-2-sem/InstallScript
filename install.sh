@@ -68,12 +68,13 @@ if [ "$get" = "s" ]; then # então
 
     cd Banco-De-Dados
     find . -type f ! -name 'BD-Notelog.sql' -exec rm -f {} +
+    cd ..
 
     echo "FROM mysql:latest
     ENV MYSQL_ROOT_PASSWORD=notelikeag0d*
     COPY ./Banco-De-Dados /docker-entrypoint-initdb.d/
     EXPOSE 3306" > Dockerfile
-    cd ..
+    
 
     cd Notelog-Application/target
     mv app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar ../..

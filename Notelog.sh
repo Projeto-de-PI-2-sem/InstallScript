@@ -50,7 +50,7 @@ if [ \“$get\” == \“s\” ]; then #entao
 	
 	# Setando jar
 	cd ..
-	cd Notelog-Application/app-note-log/target
+	cd Notelog-Application/target
 	clear
 	java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar
 	

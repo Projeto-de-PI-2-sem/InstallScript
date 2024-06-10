@@ -114,7 +114,7 @@ if [ "$get" = "s" ]; then # então
     echo "#!/bin/bash
     clear
     cd assets
-    java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar" > Notelog.sh
+    sudo java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar" > Notelog.sh
 
     # Tornar o novo script executável
     chmod 777 Notelog.sh

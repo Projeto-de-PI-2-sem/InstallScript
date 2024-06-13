@@ -40,22 +40,6 @@ if [ "$get" = "s" ]; then
         exit 1
     fi
 
-    # Criar uma rede Docker personalizada
-    echo "Criando rede Docker personalizada 'notelog-net'..."
-    sudo docker network create notelog-net
-    if [ $? -ne 0 ]; then
-        echo "Erro ao criar a rede Docker."
-        exit 1
-    fi
-
-    # Puxar a imagem MySQL
-    echo "Instalando container MySQL..."
-    sudo docker pull zeeeu/mysql-notelog:5.7
-    if [ $? -ne 0 ]; then
-        echo "Erro ao instalar imagem Docker."
-        exit 1
-    fi 
-
     # Parar e remover o contêiner MySQL antigo se existir
     if sudo docker ps -a | grep -q "mysql-notelog"; then
         echo "Parando e removendo o contêiner MySQL antigo..."
@@ -63,9 +47,9 @@ if [ "$get" = "s" ]; then
         sudo docker rm mysql-notelog
     fi
 
-    # Executar um novo contêiner MySQL na rede 'notelog-net'
+    # Executar um novo contêiner MySQL
     echo "Executando o contêiner MySQL..."
-    sudo docker run -d --name mysql-notelog --network notelog-net -p 3306:3306 zeeeu/mysql-notelog:5.7 
+    sudo docker run -d --name mysql-notelog -p 3306:3306 zeeeu/mysql-notelog:5.7 
     if [ $? -ne 0 ]; then
         echo "Erro ao executar o contêiner MySQL."
         exit 1
@@ -75,7 +59,7 @@ if [ "$get" = "s" ]; then
     cat << 'EOF' > Notelog.sh
 #!/bin/bash
 clear
-docker run -it --name notelog-start --network notelog-net zeeeu/notelog-jar:17
+docker run -it --rm --name notelog-start --network host zeeeu/notelog-jar:17
 EOF
 
     # Tornar o novo script executável

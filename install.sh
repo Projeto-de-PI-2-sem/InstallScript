@@ -14,16 +14,7 @@ echo "Gostaria de prosseguir para instalação de todas as dependências de noss
 echo "======================================================"
 
 read get
-if [ "$get" = "s" ]; then # então
-    # Verificando se o maquinário possui JRE Java
-    java -version
-    if [ $? = 0 ]; then
-        echo "Maquinário já possui JRE Java"
-    else
-        sudo apt update
-        sudo apt install openjdk-17-jre -y
-    fi
-
+if [ "$get" = "s" ]; then
     # Verificando se o maquinário possui Docker
     docker -v
     if [ $? = 0 ]; then
@@ -51,70 +42,33 @@ if [ "$get" = "s" ]; then # então
         exit 1
     fi
 
-    # Verificando se o maquinário possui Git
-    git --version
-    if [ $? = 0 ]; then
-        echo "Maquinário já possui Git"
-    else
-        sudo apt-get install git-all -y
-    fi
-    
-    mkdir assets
-    cd assets
-
-    # Clonar os repositórios Git
-    git clone https://github.com/Projeto-de-PI-2-sem/Banco-De-Dados.git
-    git clone https://github.com/Projeto-de-PI-2-sem/Notelog-Application.git
-
-    cd Banco-De-Dados
-    find . -type f ! -name 'BD-Notelog.sql' -exec rm -f {} +
-    cd ..
-
-    echo "FROM mysql:latest
-    ENV MYSQL_DATABASE=notelog
-    ENV MYSQL_USER=notelogUser
-    ENV MYSQL_PASSWORD=notelikeag0d*
-    ENV MYSQL_ROOT_PASSWORD=notelikeag0d*
-    COPY ./Banco-De-Dados /docker-entrypoint-initdb.d/
-    EXPOSE 3306" > Dockerfile
-    
-
-    cd Notelog-Application/target
-    mv app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar ../..
-    
-
-    cd ../..
-    sudo rm -rf Notelog-Application
-
     # Construir e rodar a imagem Docker   
-    echo "Construindo a imagem Docker..."
-    sudo docker build -t notelogbd .
+    echo "Instalando container Jar..."
+    sudo docker pull zeeeu/mysql-notelog:5.7
     if [ $? -ne 0 ]; then
-        echo "Erro ao construir a imagem Docker."
+        echo "Erro ao instalar imagem Docker."
         exit 1
-    fi
+    fi 
 
     # Parar e remover o contêiner antigo se existir
-    if sudo docker ps -a | grep -q "notelog-container"; then
+    if sudo docker ps -a | grep -q "mysql-notelog"; then
         echo "Parando e removendo o contêiner antigo..."
-        sudo docker stop notelog-container
-        sudo docker rm notelog-container
+        sudo docker stop mysql-notelog
+        sudo docker rm mysql-notelog
     fi
 
     # Executar um novo contêiner
     echo "Executando o contêiner Docker..."
-    sudo docker run -d --name notelog-container -p 3306:3306 notelogbd
+    sudo docker run -d --name mysql-notelog -p 3306:3306 zeeeu/mysql-notelog:5.7 
     if [ $? -ne 0 ]; then
         echo "Erro ao executar o contêiner Docker."
         exit 1
     fi
-    cd ..
 
     # Criar o novo script e escrever o conteúdo nele
     echo "#!/bin/bash
     clear
-    cd assets
-    sudo java -jar app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar" > Notelog.sh
+    docker run -it --name notelog-start --net host zeeeu/notelog-jar:17" > Notelog.sh
 
     # Tornar o novo script executável
     chmod 777 Notelog.sh
@@ -122,9 +76,6 @@ if [ "$get" = "s" ]; then # então
     echo "======================================================"
     echo "                 Instalação Finalizada                "
     echo "======================================================"
-    cd assets
-    find . -type f ! -name 'app-note-log-1.0-SNAPSHOT-jar-with-dependencies.jar' -exec rm -f {} +
-    sudo rm -rf Banco-De-Dados
 else
     echo "======================================================"
     echo "                 Instalação cancelada                 "

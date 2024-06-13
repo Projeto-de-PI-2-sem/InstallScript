@@ -15,25 +15,23 @@ echo "======================================================"
 
 read get
 if [ "$get" = "s" ]; then
-    # Verificando se o maquinário possui Docker
+    # Verificando se o Docker está instalado
     docker -v
-    if [ $? = 0 ]; then
+    if [ $? -eq 0 ]; then
         echo "Maquinário já possui DockerEngine"
     else
-       # Add Docker's official GPG key:
+        # Adicionando o repositório Docker
         sudo apt-get update
-        sudo apt-get install ca-certificates curl
+        sudo apt-get install -y ca-certificates curl gnupg
         sudo install -m 0755 -d /etc/apt/keyrings
-        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-        sudo chmod a+r /etc/apt/keyrings/docker.asc
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-        # Add the repository to Apt sources:
         echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        sudo apt-get update
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+        sudo apt-get update
         sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         sudo systemctl start docker
         sudo systemctl enable docker
@@ -42,36 +40,46 @@ if [ "$get" = "s" ]; then
         exit 1
     fi
 
-    # Construir e rodar a imagem Docker   
-    echo "Instalando container Jar..."
+    # Criar uma rede Docker personalizada
+    echo "Criando rede Docker personalizada 'notelog-net'..."
+    sudo docker network create notelog-net
+    if [ $? -ne 0 ]; then
+        echo "Erro ao criar a rede Docker."
+        exit 1
+    fi
+
+    # Puxar a imagem MySQL
+    echo "Instalando container MySQL..."
     sudo docker pull zeeeu/mysql-notelog:5.7
     if [ $? -ne 0 ]; then
         echo "Erro ao instalar imagem Docker."
         exit 1
     fi 
 
-    # Parar e remover o contêiner antigo se existir
+    # Parar e remover o contêiner MySQL antigo se existir
     if sudo docker ps -a | grep -q "mysql-notelog"; then
-        echo "Parando e removendo o contêiner antigo..."
+        echo "Parando e removendo o contêiner MySQL antigo..."
         sudo docker stop mysql-notelog
         sudo docker rm mysql-notelog
     fi
 
-    # Executar um novo contêiner
-    echo "Executando o contêiner Docker..."
-    sudo docker run -d --name mysql-notelog -p 3306:3306 zeeeu/mysql-notelog:5.7 
+    # Executar um novo contêiner MySQL na rede 'notelog-net'
+    echo "Executando o contêiner MySQL..."
+    sudo docker run -d --name mysql-notelog --network notelog-net -p 3306:3306 zeeeu/mysql-notelog:5.7 
     if [ $? -ne 0 ]; then
-        echo "Erro ao executar o contêiner Docker."
+        echo "Erro ao executar o contêiner MySQL."
         exit 1
     fi
 
-    # Criar o novo script e escrever o conteúdo nele
-    echo "#!/bin/bash
-    clear
-    docker run -it --name notelog-start --net host zeeeu/notelog-jar:17" > Notelog.sh
+    # Criar o script para iniciar o contêiner do aplicativo
+    cat << 'EOF' > Notelog.sh
+#!/bin/bash
+clear
+docker run -it --name notelog-start --network notelog-net zeeeu/notelog-jar:17
+EOF
 
     # Tornar o novo script executável
-    chmod 777 Notelog.sh
+    chmod +x Notelog.sh
 
     echo "======================================================"
     echo "                 Instalação Finalizada                "

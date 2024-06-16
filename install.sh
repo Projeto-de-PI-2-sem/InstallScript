@@ -49,7 +49,7 @@ if [ "$get" = "s" ]; then
 
     # Executar um novo contêiner MySQL
     echo "Executando o contêiner MySQL..."
-    sudo docker run -d --name mysql-notelog -p 3306:3306 zeeeu/mysql-notelog:5.7 
+    sudo docker run -d --name mysql-notelog -p 3306:3306 zeeeu/mysql-notelog:latest
     if [ $? -ne 0 ]; then
         echo "Erro ao executar o contêiner MySQL."
         exit 1
